@@ -104,12 +104,6 @@ function isDay(time) {
     return hour >= 8 && hour < 20;
 }
 
-// Utility function to check if it's day or night based on the local time
-function isDay(time) {
-    const hour = time.getHours();
-    return hour >= 8 && hour < 20;
-}
-
 function getUTCTime (shiftInSeconds) {
 
     date = new Date()
@@ -120,6 +114,10 @@ function getUTCTime (shiftInSeconds) {
     newDate = new Date(searchedTime)
 
     return newDate;
+}
+
+function capitalizeFirstLetter(val) {
+    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 }
 
 // When the bot is ready
@@ -319,7 +317,7 @@ client.on('messageCreate', async message => {
             // Merge both continent and country-specific Pokémon (avoid duplicates)
             const allRegionalPokemon = [...new Set([...continentPokemon, ...countryPokemon])];
         
-            let replyMessage = `**Regional Pokémon available in ${city} (${continent}):**\n`;
+            let replyMessage = `**Regional Pokémon available in ${capitalizeFirstLetter(city)} (${continent}):**\n`;
             
             if (allRegionalPokemon.length > 0) {
                 allRegionalPokemon.forEach(pokemon => {
