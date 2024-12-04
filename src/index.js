@@ -185,7 +185,6 @@ client.on('messageCreate', async message => {
         } else if (command === '!regional') {
             // Get the continent for the country
             const continent = await getNormalizedContinent(country);
-            console.log(country);
             // Find regional Pokémon for the identified continent
             const continentPokemon = regionalPokemon.continents[continent] || [];
         
