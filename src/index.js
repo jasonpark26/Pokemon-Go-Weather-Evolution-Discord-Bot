@@ -170,7 +170,7 @@ client.on('messageCreate', async message => {
             });
 
             // Generate message with weather and Pokémon details
-            let replyMessage = `**Weather in ${city}**\nTemperature: ${temp}°C\nDescription: ${weatherDescription}\nHumidity: ${humidity}%\nLocal Time: ${localTime.toLocaleTimeString()}\n\n**Pokémon that can evolve now:**\n`;
+            let replyMessage = `**Weather in ${capitalizeFirstLetter(city)}**\nTemperature: ${temp}°C\nDescription: ${weatherDescription}\nHumidity: ${humidity}%\nLocal Time: ${localTime.toLocaleTimeString()}\n\n**Pokémon that can evolve now:**\n`;
 
             if (evolvablePokemon.length > 0) {
                 evolvablePokemon.forEach(pokemon => {
