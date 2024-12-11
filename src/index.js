@@ -105,9 +105,41 @@ async function getNormalizedContinent(countryCode) {
 }
 
 // Helper function to check if it's day or night
-function isDay(time) {
-    const hour = time.getHours();
-    return hour >= 8 && hour < 20;
+function isDay(time, sunrise, sunset) {
+    const decimalTime = timeStringToFloat(time);
+    return decimalTime >= sunrise && decimalTime < sunset;
+}
+
+// Helper function to return hour and minutes to flat float
+function timeStringToFloat(time) {
+    let hours = time.getHours()
+    var minutes = time.getMinutes()/60;
+    return hours + minutes;
+  }
+
+function calculateSunriseSunset(longitude, latitude, utc) {
+    // Get the current date and calculate days since January 1st
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const daysSinceJan1 = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
+
+    // Calculate solar noon in minutes at UTC
+    const solarNoon = 720 - 4 * longitude;
+
+    // Calculate declination angle (in degrees)
+    const declinationAngle = -23.45 * Math.cos(((360 / 365) * (daysSinceJan1 + 10)) * (Math.PI / 180));
+
+    // Calculate the hour angle (in degrees)
+    const hourAngleDeg = (180 / Math.PI) * Math.acos(-Math.tan(latitude * (Math.PI / 180)) * Math.tan(declinationAngle * (Math.PI / 180)));
+
+    // Calculate sunrise and sunset times in minutes at UTC
+    const sunrise = solarNoon - 4 * hourAngleDeg;
+    const sunset = solarNoon + 4 * hourAngleDeg;
+
+    return {
+        sunrise: sunrise / 60 + utc,
+        sunset: sunset / 60 + utc
+    };
 }
 
 function getUTCTime (shiftInSeconds) {
@@ -154,11 +186,15 @@ client.on('messageCreate', async message => {
 
         // Extract relevant weather data
         const { main: { temp, humidity }, weather, timezone } = data;
+        const long = data.coord.lon;
+        const lat = data.coord.lat;
         const country = data.sys.country;
         const weatherDescription = weather[0].description;
         const weatherType = weather[0].main;
+        const utc = timezone/3600;
         const localTime = getUTCTime(timezone);
-        const day = isDay(localTime);
+        const { sunrise, sunset } = calculateSunriseSunset(long, lat, utc);
+        const day = isDay(localTime,sunrise,sunset);
 
         if (command === '!weather') {
             // Filter Pokémon based on time of day and weather conditions
